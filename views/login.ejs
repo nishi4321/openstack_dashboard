@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <title>OpenStack Dashboard</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container" style="max-width: 500px !important;">
+    <div class="d-flex align-items-center" style="height: 100vh;">
+      <div class="card" style="width: 500px">
+        <div class="card-header">OpenStack Dashboard</div>
+        <div class="card-body">
+          <h5 class="card-title">Login</h5>
+          <form>
+            <div class="form-group">
+              <label for="exampleInputEmail1">Username</label>
+              <input type="text" class="form-control" id="usernameInput" placeholder="admin">
+            </div>
+            <div class="form-group">
+              <label for="exampleInputPassword1">Password</label>
+              <input type="password" class="form-control" id="passwordInput" placeholder="password">
+            </div>
+            <div class="alert alert-danger" role="alert" id="alert" style="display: none;">
+              ユーザー名またはパスワードが間違っています。
+            </div>
+            <button type="button" id="loginButton" class="btn btn-primary float-right" onclick="login()">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/4.1.0/superagent.min.js"
+    integrity="sha512-LJaxxgpiq7SihGQ21nejROsll6FRrgbs0Wxtgqb5x+Q0CJICA3vt8hlBxSD8NLsO+Yabgg3B7ARexiijKiojGg=="
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+
+  <script>
+    var request = window.superagent;
+
+    function login() {
+      $("#loginButton").prop('disabled', true);
+      request.post("http://localhost:3000/api/login").send({ username: $("#usernameInput").val(), password: $("#passwordInput").val() }).end(function (err, res) {
+        console.log(res.body);
+        if (res.body.success) {
+          // OK
+          Cookies.set("jwttoken", res.body.jwttoken, { expires: 1 })
+          location.href = "/dashboard?token=" + res.body.jwttoken 
+        } else {
+          // Bad
+          $("#loginButton").prop('disabled', false);
+          $('#alert').show();
+        }
+      });
+    }
+  </script>
+
+
+  <!-- Icons -->
+  <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
+  <script>
+    feather.replace()
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+  <script>
+    window.jQuery || document.write('<script src="/docs/4.4/assets/js/vendor/jquery-slim.min.js"><\/script>')
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
