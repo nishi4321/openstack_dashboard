@@ -4,7 +4,7 @@ require('dotenv').config();
 exports.getservers = function (token) {
     return new Promise(function (resolve, reject) {
         var options = {
-            uri: process.env.COMPUTE_API_URL + "/servers",
+            uri: process.env.COMPUTE_API_URL + "/servers/detail",
             headers: {
                 "Content-Type": "application/json",
                 "X-Auth-Token": token,

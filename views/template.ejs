@@ -23,7 +23,7 @@
     <ul class="navbar-nav px-3">
       <li class="nav-item text-nowrap">
         <!-- <a class="nav-link" href="#">Sign out</a> -->
-        <a class="nav-link" href="javascript:void(0);" onclick="onLogout()">ログアウト</a>
+        <a class="nav-link" href="javascript:void(0);" onclick="onLogout()">Logout</a>
       </li>
     </ul>
   </nav>
@@ -270,9 +270,16 @@
     </div>
   </div>
 
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/4.1.0/superagent.min.js"
+    integrity="sha512-LJaxxgpiq7SihGQ21nejROsll6FRrgbs0Wxtgqb5x+Q0CJICA3vt8hlBxSD8NLsO+Yabgg3B7ARexiijKiojGg=="
+    crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
-  
+
   <script>
+
+    var request = window.superagent;
+
     function onLogout() {
       Cookies.remove("jwttoken");
       location.href = "/"

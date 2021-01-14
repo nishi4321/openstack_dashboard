@@ -1,10 +1,10 @@
 var request = require('request');
 require('dotenv').config();
 
-exports.getflavors = function (token) {
+exports.getquotas = function (token, projectid) {
     return new Promise(function (resolve, reject) {
         var options = {
-            uri: process.env.COMPUTE_API_URL + "/flavors/detail",
+            uri: process.env.COMPUTE_API_URL + "/os-quota-sets/" + projectid + "/detail",
             headers: {
                 "Content-Type": "application/json",
                 "X-Auth-Token": token,

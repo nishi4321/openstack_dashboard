@@ -38,7 +38,7 @@ exports.auth = function (username, password) {
                 reject("error")
             } else {
                 // Return to token.
-                resolve(response.caseless.dict["x-subject-token"])
+                resolve({token:response.caseless.dict["x-subject-token"],projectid: body.token.project.id})
             }
         });
     })

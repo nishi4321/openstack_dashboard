@@ -30,10 +30,10 @@ app.get('/login', function (req, res) {
 app.post('/api/login', function (req, res) {
     var username = req.body.username;
     var password = req.body.password;
-    openstackapi.identity(username, password).then(function (token) {
+    openstackapi.identity(username, password).then(function (result) {
         // OK
-        var jwttoken = jwt.sign({ username: username, token: token }, app.get("superSecret"), { expiresIn: "24h" });
-        res.json({ success: true, jwttoken })
+        var jwttoken = jwt.sign({ username: username, token: result.token, projectid: result.projectid }, app.get("superSecret"), { expiresIn: "24h" });
+        res.json({ success: true, jwttoken: jwttoken })
     }).catch(function (error) {
         // Bad
         res.json({ success: false });
@@ -68,16 +68,22 @@ app.use((req, res, next) => {
 });
 
 /**
- * Login page.
+ * overview page.
  */
 app.get('/dashboard', function (req, res) {
     res.render("dashboard", {});
 });
 
 /**
- * Get server list.
+ * instances page.
  */
-app.get("/api/getservers", function (req, res, next) {
+app.get('/instances', function (req, res) {
+    res.render("instances", {});
+});
+/**
+ * Get instance list.
+ */
+app.get("/api/getinstances", function (req, res, next) {
     openstackapi.getservers(req.decoded.token).then(function (result) {
         res.json({ success: true, body: result });
     }).catch(function () {
@@ -93,6 +99,17 @@ app.get("/api/getflavors", function (req, res, next) {
         res.json({ success: true, body: result });
     }).catch(function () {
         res.json({ success: false, msg: "Failed to get flavor list." })
+    })
+});
+
+/**
+ * Get quota.
+ */
+app.get("/api/getquotas", function (req, res, next) {
+    openstackapi.getquotas(req.decoded.token, req.decoded.projectid).then(function (result) {
+        res.json({ success: true, body: result });
+    }).catch(function () {
+        res.json({ success: false, msg: "Failed to get quota." })
     })
 });
 
