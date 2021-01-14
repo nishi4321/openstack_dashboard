@@ -6,6 +6,8 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
   <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&display=swap" rel="stylesheet">
   <link href="./css/dashboard.css" rel="stylesheet">
+
+  <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
 </head>
 
 <body>
@@ -34,83 +36,27 @@
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="javascript:void(0);"
-                onclick="location.href = '/dashboard?token=' + Cookies.get('jwttoken');">
-                <span data-feather="home"></span>
-                OVERVIEW
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active" href="javascript:void(0);"
-                onclick="location.href = '/instances?token=' + Cookies.get('jwttoken');">
-                <span data-feather="file"></span>
-                INSTANCES<span class="sr-only">(current)</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="shopping-cart"></span>
-                <!-- Products -->
-                商品
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="users"></span>
-                <!-- Customers -->
-                お客様
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
+            <a class="nav-link" href="javascript:void(0);" onclick="location.href = '/dashboard?token=' + Cookies.get('jwttoken');">
                 <span data-feather="bar-chart-2"></span>
-                <!-- Reports -->
-                レポート
+                Overview
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="layers"></span>
-                <!-- Integrations -->
-                インテグレーション
-              </a>
-            </li>
-          </ul>
-
-          <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-            <!-- <span>Saved reports</span> -->
-            <span>保存したレポート</span>
-            <a class="d-flex align-items-center text-muted" href="#">
-              <span data-feather="plus-circle"></span>
-            </a>
-          </h6>
-          <ul class="nav flex-column mb-2">
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                <!-- Current month -->
-                今月
+              <a class="nav-link active" href="javascript:void(0);" onclick="location.href = '/instances?token=' + Cookies.get('jwttoken');">
+                <span data-feather="cpu"></span>
+                Instance<span class="sr-only">(current)</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                <!-- Last quarter -->
-                前四半期
+              <a class="nav-link" href="javascript:void(0);">
+                <span data-feather="shield"></span>
+                Security Group (Coming soon)
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                <!-- Social engagement -->
-                社会参画
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">
-                <span data-feather="file-text"></span>
-                <!-- Year-end sale -->
-                年末のセール
+              <a class="nav-link" href="javascript:void(0);">
+                <span data-feather="git-commit"></span>
+                Network (Coming soon)
               </a>
             </li>
           </ul>
@@ -238,7 +184,6 @@
   </script>
 
   <!-- Icons -->
-  <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
   <script>
     feather.replace()
   </script>
