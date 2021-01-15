@@ -36,13 +36,15 @@
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-            <a class="nav-link" href="javascript:void(0);" onclick="location.href = '/dashboard?token=' + Cookies.get('jwttoken');">
+              <a class="nav-link" href="javascript:void(0);"
+                onclick="location.href = '/dashboard?token=' + Cookies.get('jwttoken');">
                 <span data-feather="bar-chart-2"></span>
                 Overview
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link active" href="javascript:void(0);" onclick="location.href = '/instances?token=' + Cookies.get('jwttoken');">
+              <a class="nav-link active" href="javascript:void(0);"
+                onclick="location.href = '/instances?token=' + Cookies.get('jwttoken');">
                 <span data-feather="cpu"></span>
                 Instance<span class="sr-only">(current)</span>
               </a>
@@ -68,7 +70,8 @@
           class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Instances</h1>
           <div class="btn-toolbar mb-2 mb-md-0">
-            <button type="button" class="btn btn-sm btn-outline-secondary">Create new instance</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="onCreateModalOpen();">Create new
+              instance</button>
           </div>
         </div>
 
@@ -91,6 +94,68 @@
           </table>
         </div>
       </main>
+    </div>
+  </div>
+
+  <div class="modal" id="detailModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="detailServerName"></h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="detailServerBody">
+          <p>Modal body text goes here.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="createModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Create a new instance</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="detailServerBody">
+          <form>
+            <div class="form-group">
+              <label for="ci-name">Instance name</label>
+              <input class="form-control form-control-sm" id="ci-name" type="text" placeholder="instance name">
+            </div>
+            <div class="form-group">
+              <label for="ci-os">OS</label>
+              <select class="form-control form-control-sm" id="ci-os">
+                <option>Small select</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ci-size">Instance size</label>
+              <select class="form-control form-control-sm" id="ci-size">
+                <option>Small select</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="ci-password">Instance password</label>
+              <input class="form-control form-control-sm" id="ci-password" type="password"
+                placeholder="instance password">
+              <small class="form-text text-muted">Set password to your instance's default user.</small>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="onCreateInstance();">Create</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -138,6 +203,7 @@
         if (res.body.success) {
           // OK
           var instanceList = JSON.parse(res.body.body).servers;
+          $('#instance-list').html("");
           for (var instance of instanceList) {
             var flavorId = instance.flavor.id;
             var cpu;
@@ -148,7 +214,7 @@
                 memory = f.ram;
               }
             }
-            generateList(instance.name, instance.addresses, cpu, memory, instance.security_groups, instance.status)
+            generateList(instance.name, instance.addresses, cpu, memory, instance.security_groups, instance.status, instance.id)
           }
         } else {
           // Bad
@@ -156,7 +222,91 @@
       });
     }
 
-    function generateList(name, ipaddreses, cpu, memory, securitygroup, status) {
+    function onCreateInstance() {
+      var name = $('#ci-name').val();
+      var os = $('#ci-os').val();
+      var size = $('#ci-size').val();
+      var password = $('#ci-password').val();
+      console.log(name, os, size, password);
+      request.post("http://localhost:3000/api/createinstance?token=" + Cookies.get("jwttoken")).send({ name: name, image: os, flavor: size, password: password }).end(function (err, res) {
+        if (res.body.success) {
+          // OK
+          var result = res.body.body.server;
+          console.log(result)
+          $('#createModal').modal('hide');
+          // 
+          timerId = setInterval(function () {
+            var text = $('#instance-list').html();
+            if (text.includes(result.id) && !text.includes("BUILD")) {
+              clearInterval(timerId);
+            }
+            onLoad();
+          }, 1000);
+        } else {
+          // Bad
+        }
+      });
+    }
+
+    function onCreateModalOpen() {
+      // Open Modal
+      $('#createModal').modal('show');
+      // Set contents.
+      $('#ci-size').text("");
+      for (var f of flavorList) {
+        $('#ci-size').append("<option value=\'" + f.id + "\'>" + f.name + " (" + f.vcpus + "Core, " + f.ram + "MB)</option>");
+      }
+      // Get Image list.
+      $('#ci-os').text("");
+      request.get("http://localhost:3000/api/getimages?token=" + Cookies.get("jwttoken")).end(function (err, res) {
+        if (res.body.success) {
+          // OK
+          imageList = JSON.parse(res.body.body).images;
+          for (var i of imageList) {
+            $('#ci-os').append("<option value=\'" + i.id + "\'>" + i.name + "</option>");
+          }
+        } else {
+          // Bad
+
+        }
+      });
+    }
+
+    function onDetail(serverid) {
+      // Open Modal
+      $('#detailModal').modal('show');
+      // 
+      request.post("http://localhost:3000/api/getinstancedetail?token=" + Cookies.get("jwttoken")).send({ serverid: serverid }).end(function (err, res) {
+        if (res.body.success) {
+          // OK
+          var detail = JSON.parse(res.body.body).server;
+          $('#detailServerName').text(detail.name);
+          $('#detailServerBody').html("<p>" + JSON.stringify(detail) + "</p>")
+        } else {
+          // Bad
+        }
+      });
+    }
+
+    function onDelete(serverid, name) {
+      request.post("http://localhost:3000/api/deleteinstance?token=" + Cookies.get("jwttoken")).send({ serverid: serverid }).end(function (err, res) {
+        if (res.body.success) {
+          // OK
+          timerId = setInterval(function () {
+            var text = $('#instance-list').html();
+            if (!text.includes(serverid)) {
+              clearInterval(timerId);
+            }
+            onLoad();
+          }, 1000);
+          setTimeout(onLoad, 1500);
+        } else {
+          // Bad
+        }
+      });
+    }
+
+    function generateList(name, ipaddreses, cpu, memory, securitygroup, status, serverid) {
       var dom = "<tr>";
       dom += "<td>" + name + "</td>";
       try {
@@ -171,13 +321,17 @@
       }
       dom += "<td>" + cpu + "Core</td>";
       dom += "<td>" + memory + "MB</td>";
-      var sgText = [];
-      for(var j of securitygroup) {
-        sgText.push(j.name);
+      try {
+        var sgText = [];
+        for (var j of securitygroup) {
+          sgText.push(j.name);
+        }
+        dom += "<td>" + sgText.toString().replace(",", ", ") + "</td>";
+      } catch {
+        dom += "<td></td>";
       }
-      dom += "<td>" + sgText.toString().replace(",", ", ") + "</td>";
       dom += "<td>" + status + "</td>";
-      dom += '<td><div class="btn-group"><button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button><div class="dropdown-menu"></div></div></td>';
+      dom += '<td><div class="btn-group"><button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button><div class="dropdown-menu"><a class="dropdown-item" href="javascript:void(0);" onclick="onDetail(\'' + serverid + '\');">Show detail</a><div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="onDelete(\'' + serverid + '\', \'' + name + '\');">Delete instance</a></div></div></td>';
       $('#instance-list').append(dom);
     }
 

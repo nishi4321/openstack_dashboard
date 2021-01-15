@@ -80,6 +80,7 @@ app.get('/dashboard', function (req, res) {
 app.get('/instances', function (req, res) {
     res.render("instances", {});
 });
+
 /**
  * Get instance list.
  */
@@ -92,6 +93,39 @@ app.get("/api/getinstances", function (req, res, next) {
 });
 
 /**
+ * Get instance detail.
+ */
+app.post("/api/getinstancedetail", function (req, res, next) {
+    openstackapi.getserverdetail(req.decoded.token, req.body.serverid).then(function (result) {
+        res.json({ success: true, body: result });
+    }).catch(function () {
+        res.json({ success: false, msg: "Failed to get server list." })
+    })
+});
+
+/**
+ * Get instance detail.
+ */
+app.post("/api/deleteinstance", function (req, res, next) {
+    openstackapi.deleteinstance(req.decoded.token, req.body.serverid).then(function (result) {
+        res.json({ success: true, body: result });
+    }).catch(function () {
+        res.json({ success: false, msg: "Failed to get server list." })
+    })
+});
+
+/**
+ * Create instance.
+ */
+app.post("/api/createinstance", function (req, res, next) {
+    openstackapi.createinstance(req.decoded.token, req.body.name, req.body.image, req.body.flavor, req.body.password).then(function (result) {
+        res.json({ success: true, body: result });
+    }).catch(function () {
+        res.json({ success: false, msg: "Failed to create instance." })
+    })
+});
+
+/**
  * Get flavor list.
  */
 app.get("/api/getflavors", function (req, res, next) {
@@ -99,6 +133,17 @@ app.get("/api/getflavors", function (req, res, next) {
         res.json({ success: true, body: result });
     }).catch(function () {
         res.json({ success: false, msg: "Failed to get flavor list." })
+    })
+});
+
+/**
+ * Get image list.
+ */
+app.get("/api/getimages", function (req, res, next) {
+    openstackapi.getimages(req.decoded.token).then(function (result) {
+        res.json({ success: true, body: result });
+    }).catch(function () {
+        res.json({ success: false, msg: "Failed to get image list." })
     })
 });
 
