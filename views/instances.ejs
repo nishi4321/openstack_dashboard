@@ -150,10 +150,18 @@
               <small class="form-text text-muted">Set password to your instance's default user.</small>
             </div>
           </form>
+          <div class="progress" id="ci-progressbar">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100"
+              aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+          </div>
+          <div class="alert alert-danger" role="alert" id="ci-alert">
+            A simple danger alert—check it out!
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="onCreateInstance();">Create</button>
+          <button type="button" class="btn btn-primary" onclick="onCreateInstance();"
+            id="ci-createbutton">Create</button>
         </div>
       </div>
     </div>
@@ -165,6 +173,14 @@
     crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+  <script>
+    window.jQuery || document.write('<script src="/docs/4.4/assets/js/vendor/jquery-slim.min.js"><\/script>')
+  </script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+  
   <script>
     var request = window.superagent;
 
@@ -178,6 +194,8 @@
     }
 
     function onLoad() {
+      $('#ci-progressbar').hide();
+      $('#ci-alert').hide();
       getFlavorList().then(function () {
         getInstanceList();
       });
@@ -223,6 +241,9 @@
     }
 
     function onCreateInstance() {
+      $('#ci-createbutton').prop('disabled', true);
+      $('#ci-progressbar').show();
+      $('#ci-alert').hide();
       var name = $('#ci-name').val();
       var os = $('#ci-os').val();
       var size = $('#ci-size').val();
@@ -233,6 +254,8 @@
           // OK
           var result = res.body.body.server;
           console.log(result)
+          $('#ci-createbutton').prop('disabled', false);
+          $('#ci-progressbar').hide();
           $('#createModal').modal('hide');
           // 
           timerId = setInterval(function () {
@@ -240,10 +263,19 @@
             if (text.includes(result.id) && !text.includes("BUILD")) {
               clearInterval(timerId);
             }
-            onLoad();
+            getInstanceList();
           }, 1000);
         } else {
           // Bad
+          var errorMsgKeys = Object.keys(res.body.msg);
+          var errorText = "";
+          for (var key of errorMsgKeys) {
+            errorText += res.body.msg[key].message
+          }
+          $('#ci-alert').text(errorText)
+          $('#ci-alert').show();
+          $('#ci-progressbar').hide();
+          $('#ci-createbutton').prop('disabled', false);
         }
       });
     }
@@ -297,7 +329,7 @@
             if (!text.includes(serverid)) {
               clearInterval(timerId);
             }
-            onLoad();
+            getInstanceList();
           }, 1000);
           setTimeout(onLoad, 1500);
         } else {
@@ -310,10 +342,13 @@
       var dom = "<tr>";
       dom += "<td>" + name + "</td>";
       try {
-        var ipaddressesList = ipaddreses.public1;
-        var ipText = [];
-        for (var i of ipaddressesList) {
-          ipText.push(i.addr);
+        var keys = Object.keys(ipaddreses)
+        for (var key of keys) {
+          var ipaddressesList = ipaddreses[key];
+          var ipText = [];
+          for (var i of ipaddressesList) {
+            ipText.push(i.addr);
+          }
         }
         dom += "<td>" + ipText.toString().replace(",", ", ") + "</td>";
       } catch {
@@ -342,13 +377,6 @@
     feather.replace()
   </script>
 
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-    crossorigin="anonymous"></script>
-  <script>
-    window.jQuery || document.write('<script src="/docs/4.4/assets/js/vendor/jquery-slim.min.js"><\/script>')
-  </script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

@@ -120,8 +120,8 @@ app.post("/api/deleteinstance", function (req, res, next) {
 app.post("/api/createinstance", function (req, res, next) {
     openstackapi.createinstance(req.decoded.token, req.body.name, req.body.image, req.body.flavor, req.body.password).then(function (result) {
         res.json({ success: true, body: result });
-    }).catch(function () {
-        res.json({ success: false, msg: "Failed to create instance." })
+    }).catch(function (error) {
+        res.json({ success: false, msg: error })
     })
 });
 

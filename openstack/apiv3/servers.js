@@ -94,7 +94,7 @@ exports.createinstance = function (token, name, image, flavor, password) {
         };
         request.post(options, function (error, response, body) {
             if (error || response.statusCode != 202) {
-                reject("error")
+                reject(body)
             } else {
                 resolve(body)
             }
