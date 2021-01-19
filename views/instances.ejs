@@ -93,6 +93,11 @@
             </tbody>
           </table>
         </div>
+
+        <div class="progress" id="loadprogress">
+          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100"
+            aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+        </div>
       </main>
     </div>
   </div>
@@ -167,6 +172,28 @@
     </div>
   </div>
 
+  <div class="modal" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteTitle">Create a new instance</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" id="detailServerBody">
+          <div class="alert alert-danger" role="alert" id="ci-alert">
+            Are you sure you want to delete? <strong>This operation cannot be undone.</strong>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="deleteButton" id="ci-createbutton">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/superagent/4.1.0/superagent.min.js"
     integrity="sha512-LJaxxgpiq7SihGQ21nejROsll6FRrgbs0Wxtgqb5x+Q0CJICA3vt8hlBxSD8NLsO+Yabgg3B7ARexiijKiojGg=="
@@ -180,7 +207,7 @@
     window.jQuery || document.write('<script src="/docs/4.4/assets/js/vendor/jquery-slim.min.js"><\/script>')
   </script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-  
+
   <script>
     var request = window.superagent;
 
@@ -234,6 +261,8 @@
             }
             generateList(instance.name, instance.addresses, cpu, memory, instance.security_groups, instance.status, instance.id)
           }
+          // 
+          $('#loadprogress').hide();
         } else {
           // Bad
         }
@@ -248,19 +277,21 @@
       var os = $('#ci-os').val();
       var size = $('#ci-size').val();
       var password = $('#ci-password').val();
-      console.log(name, os, size, password);
       request.post("http://localhost:3000/api/createinstance?token=" + Cookies.get("jwttoken")).send({ name: name, image: os, flavor: size, password: password }).end(function (err, res) {
         if (res.body.success) {
           // OK
           var result = res.body.body.server;
-          console.log(result)
           $('#ci-createbutton').prop('disabled', false);
           $('#ci-progressbar').hide();
           $('#createModal').modal('hide');
           // 
+          $('#loadprogress').show();
+          // 
           timerId = setInterval(function () {
             var text = $('#instance-list').html();
             if (text.includes(result.id) && !text.includes("BUILD")) {
+              // 
+              $('#loadprogress').hide();
               clearInterval(timerId);
             }
             getInstanceList();
@@ -286,7 +317,7 @@
       // Set contents.
       $('#ci-size').text("");
       for (var f of flavorList) {
-        $('#ci-size').append("<option value=\'" + f.id + "\'>" + f.name + " (" + f.vcpus + "Core, " + f.ram + "MB)</option>");
+        $('#ci-size').append("<option value=\'" + f.id + "\'>" + f.name + " (vCPU : " + f.vcpus + "Core, Memory : " + f.ram + "MB, Disk : " + f.disk + "GB)</option>");
       }
       // Get Image list.
       $('#ci-os').text("");
@@ -320,13 +351,27 @@
       });
     }
 
-    function onDelete(serverid, name) {
+    function openDeleteModal(serverid, name) {
+      // Open Modal
+      $('#deleteModal').modal('show');
+      $('#deleteTitle').text("Delete instance : " + name);
+      $('#deleteButton').on('click', function () {
+        onDelete(serverid);
+        $('#deleteModal').modal('hide');
+      });
+    }
+
+    function onDelete(serverid) {
+      // 
+      $('#loadprogress').show();
       request.post("http://localhost:3000/api/deleteinstance?token=" + Cookies.get("jwttoken")).send({ serverid: serverid }).end(function (err, res) {
         if (res.body.success) {
           // OK
           timerId = setInterval(function () {
             var text = $('#instance-list').html();
             if (!text.includes(serverid)) {
+              // 
+              $('#loadprogress').hide();
               clearInterval(timerId);
             }
             getInstanceList();
@@ -366,7 +411,7 @@
         dom += "<td></td>";
       }
       dom += "<td>" + status + "</td>";
-      dom += '<td><div class="btn-group"><button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button><div class="dropdown-menu"><a class="dropdown-item" href="javascript:void(0);" onclick="onDetail(\'' + serverid + '\');">Show detail</a><div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="onDelete(\'' + serverid + '\', \'' + name + '\');">Delete instance</a></div></div></td>';
+      dom += '<td><div class="btn-group"><button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button><div class="dropdown-menu"><a class="dropdown-item" href="javascript:void(0);" onclick="onDetail(\'' + serverid + '\');">Show detail</a><div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="openDeleteModal(\'' + serverid + '\', \'' + name + '\');">Delete instance</a></div></div></td>';
       $('#instance-list').append(dom);
     }
 

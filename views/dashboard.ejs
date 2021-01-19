@@ -36,13 +36,15 @@
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-            <a class="nav-link active" href="javascript:void(0);" onclick="location.href = '/dashboard?token=' + Cookies.get('jwttoken');">
+              <a class="nav-link active" href="javascript:void(0);"
+                onclick="location.href = '/dashboard?token=' + Cookies.get('jwttoken');">
                 <span data-feather="bar-chart-2"></span>
                 Overview<span class="sr-only">(current)</span>
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="javascript:void(0);" onclick="location.href = '/instances?token=' + Cookies.get('jwttoken');">
+              <a class="nav-link" href="javascript:void(0);"
+                onclick="location.href = '/instances?token=' + Cookies.get('jwttoken');">
                 <span data-feather="cpu"></span>
                 Instance
               </a>
@@ -50,13 +52,13 @@
             <li class="nav-item">
               <a class="nav-link" href="javascript:void(0);">
                 <span data-feather="shield"></span>
-                Security Group
+                Security Group (Coming soon)
               </a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="javascript:void(0);">
                 <span data-feather="git-commit"></span>
-                Network
+                Network (Coming soon)
               </a>
             </li>
           </ul>
@@ -140,7 +142,7 @@
       request.get("http://localhost:3000/api/getquotas?token=" + Cookies.get("jwttoken")).end(function (err, res) {
         if (res.body.success) {
           // OK
-        var quota_set = JSON.parse(res.body.body).quota_set;
+          var quota_set = JSON.parse(res.body.body).quota_set;
           /* Instance */
           $('#instance-quota').text(quota_set.instances.in_use + " / " + quota_set.instances.limit);
           updateProgress(quota_set.instances.in_use, quota_set.instances.limit, "instance-progress");
