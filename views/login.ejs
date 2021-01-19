@@ -41,7 +41,7 @@
 
     function login() {
       $("#loginButton").prop('disabled', true);
-      request.post("http://localhost:3000/api/login").send({ username: $("#usernameInput").val(), password: $("#passwordInput").val() }).end(function (err, res) {
+      request.post("/api/login").send({ username: $("#usernameInput").val(), password: $("#passwordInput").val() }).end(function (err, res) {
         if (!err) {
           if (res.body.success) {
             // OK

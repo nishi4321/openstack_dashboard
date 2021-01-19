@@ -137,7 +137,7 @@
     }
 
     function getQuota() {
-      request.get("http://localhost:3000/api/getquotas?token=" + Cookies.get("jwttoken")).end(function (err, res) {
+      request.get("/api/getquotas?token=" + Cookies.get("jwttoken")).end(function (err, res) {
         if (res.body.success) {
           // OK
           var quota_set = JSON.parse(res.body.body).quota_set;

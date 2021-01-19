@@ -228,7 +228,7 @@
 
     function getFlavorList() {
       return new Promise(function (resolve, reject) {
-        request.get("http://localhost:3000/api/getflavors?token=" + Cookies.get("jwttoken")).end(function (err, res) {
+        request.get("/api/getflavors?token=" + Cookies.get("jwttoken")).end(function (err, res) {
           if (res.body.success) {
             // OK
             flavorList = JSON.parse(res.body.body).flavors;
@@ -242,7 +242,7 @@
     }
 
     function getInstanceList() {
-      request.get("http://localhost:3000/api/getinstances?token=" + Cookies.get("jwttoken")).end(function (err, res) {
+      request.get("/api/getinstances?token=" + Cookies.get("jwttoken")).end(function (err, res) {
         if (res.body.success) {
           // OK
           var instanceList = JSON.parse(res.body.body).servers;
@@ -275,7 +275,7 @@
       var os = $('#ci-os').val();
       var size = $('#ci-size').val();
       var password = $('#ci-password').val();
-      request.post("http://localhost:3000/api/createinstance?token=" + Cookies.get("jwttoken")).send({ name: name, image: os, flavor: size, password: password }).end(function (err, res) {
+      request.post("/api/createinstance?token=" + Cookies.get("jwttoken")).send({ name: name, image: os, flavor: size, password: password }).end(function (err, res) {
         if (res.body.success) {
           // OK
           var result = res.body.body.server;
@@ -319,7 +319,7 @@
       }
       // Get Image list.
       $('#ci-os').text("");
-      request.get("http://localhost:3000/api/getimages?token=" + Cookies.get("jwttoken")).end(function (err, res) {
+      request.get("/api/getimages?token=" + Cookies.get("jwttoken")).end(function (err, res) {
         if (res.body.success) {
           // OK
           imageList = JSON.parse(res.body.body).images;
@@ -337,7 +337,7 @@
       // Open Modal
       $('#detailModal').modal('show');
       // 
-      request.post("http://localhost:3000/api/getinstancedetail?token=" + Cookies.get("jwttoken")).send({ serverid: serverid }).end(function (err, res) {
+      request.post("/api/getinstancedetail?token=" + Cookies.get("jwttoken")).send({ serverid: serverid }).end(function (err, res) {
         if (res.body.success) {
           // OK
           var detail = JSON.parse(res.body.body).server;
@@ -362,7 +362,7 @@
     function onDelete(serverid) {
       // 
       $('#loadprogress').show();
-      request.post("http://localhost:3000/api/deleteinstance?token=" + Cookies.get("jwttoken")).send({ serverid: serverid }).end(function (err, res) {
+      request.post("/api/deleteinstance?token=" + Cookies.get("jwttoken")).send({ serverid: serverid }).end(function (err, res) {
         if (res.body.success) {
           // OK
           timerId = setInterval(function () {
