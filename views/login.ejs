@@ -44,15 +44,20 @@
     function login() {
       $("#loginButton").prop('disabled', true);
       request.post("http://localhost:3000/api/login").send({ username: $("#usernameInput").val(), password: $("#passwordInput").val() }).end(function (err, res) {
-        console.log(res.body);
-        if (res.body.success) {
-          // OK
-          Cookies.set("jwttoken", res.body.jwttoken, { expires: 1 })
-          location.href = "/dashboard?token=" + res.body.jwttoken 
+        if (!err) {
+          if (res.body.success) {
+            // OK
+            Cookies.set("jwttoken", res.body.jwttoken, { expires: 1 })
+            location.href = "/dashboard?token=" + res.body.jwttoken
+          } else {
+            // Bad
+            $("#loginButton").prop('disabled', false);
+            $('#alert').show();
+          }
         } else {
-          // Bad
+          // Error
           $("#loginButton").prop('disabled', false);
-          $('#alert').show();
+          console.error(err);
         }
       });
     }
