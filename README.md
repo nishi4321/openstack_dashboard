@@ -1,5 +1,6 @@
 # openstack_dashboard
 
+このドキュメントは加筆中です．
 
 # API
 - `/api/login`
