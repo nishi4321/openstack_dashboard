@@ -409,7 +409,7 @@
         dom += "<td></td>";
       }
       dom += "<td>" + status + "</td>";
-      dom += '<td><div class="btn-group"><button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button><div class="dropdown-menu"><a class="dropdown-item" href="javascript:void(0);" onclick="onDetail(\'' + serverid + '\');">Show detail</a><div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="openDeleteModal(\'' + serverid + '\', \'' + name + '\');">Delete instance</a></div></div></td>';
+      dom += '<td><div class="btn-group"><button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button><div class="dropdown-menu"><a class="dropdown-item disabled" href="javascript:void(0);" onclick="onDetail(\'' + serverid + '\');">Show detail(Coming soon)</a><div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="openDeleteModal(\'' + serverid + '\', \'' + name + '\');">Delete instance</a></div></div></td>';
       $('#instance-list').append(dom);
     }
 
