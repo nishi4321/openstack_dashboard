@@ -45,23 +45,19 @@ app.post('/api/login', function (req, res) {
  */
 app.use((req, res, next) => {
     var token = req.body.token || req.query.token;
-    // tokenがない場合、アクセスを拒否
     if (!token) {
         return res.status(403).send({
             success: false,
             msg: "No token provided"
         });
     }
-    // tokenが改ざんされていないかチェック
     jwt.verify(token, app.get("superSecret"), (err, decoded) => {
-        // tokenが不正なものだった場合、アクセス拒否
         if (err) {
             return res.json({
                 success: false,
                 msg: "Invalid token"
             });
         }
-        // 正しいtokenの場合、認証OKする
         req.decoded = decoded;
         next();
     });
