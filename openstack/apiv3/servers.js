@@ -101,3 +101,26 @@ exports.createinstance = function (token, name, image, flavor, password) {
         });
     })
 }
+
+exports.bootinstance = function (token, instanceId) {
+    return new Promise(function (resolve, reject) {
+        // 
+        var options = {
+            uri: process.env.COMPUTE_API_URL + "/servers/" + instanceId + "/action",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Auth-Token": token,
+            },
+            json: {
+                "os-start": null
+            }
+        };
+        request.post(options, function (error, response, body) {
+            if (error || response.statusCode != 202) {
+                reject(body)
+            } else {
+                resolve(body)
+            }
+        });
+    })
+}

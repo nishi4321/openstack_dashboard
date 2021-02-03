@@ -74,11 +74,19 @@ exports.getimages = function (token) {
     })
 }
 
-
-
 exports.createinstance = function (token, name, image, flavor, password) {
     return new Promise(function (resolve, reject) {
         server.createinstance(token, name, image, flavor, password).then(function (body) {
+            resolve(body);
+        }).catch(function (error) {
+            reject(error);
+        });
+    })
+}
+
+exports.bootinstance = function (token, instanceId) {
+    return new Promise(function (resolve, reject) {
+        server.bootinstance(token, instanceId).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);

@@ -70,6 +70,7 @@
           class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Instances</h1>
           <div class="btn-toolbar mb-2 mb-md-0">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="onLoad();" style="margin-right:  .5rem !important;"><span data-feather="refresh-ccw"></span></button>
             <button type="button" class="btn btn-sm btn-outline-secondary" onclick="onCreateModalOpen();">Create new
               instance</button>
           </div>
@@ -229,6 +230,7 @@
       $('#ci-progressbar').hide();
       $('#ci-alert').hide();
       $('#detail-progressbar').hide();
+      $('#loadprogress').show();
       getFlavorList().then(function () {
         getImageList().then(function () {
           getInstanceList();
@@ -447,6 +449,19 @@
       });
     }
 
+    function bootInstance(instanceId) {
+      request.post("/api/bootinstance?token=" + Cookies.get("jwttoken")).send({ instanceId: instanceId }).end(function (err, res) {
+        if (res.body.success) {
+          // OK
+          timerId = setTimeout(function () {
+            getInstanceList();
+          }, 5000);
+        } else {
+          // Bad
+        }
+      });
+    }
+
     function generateList(name, ipaddreses, cpu, memory, image, securitygroup, status, serverid) {
       var dom = "<tr>";
       dom += "<td>" + name + "</td>";
@@ -480,7 +495,16 @@
         dom += "<td></td>";
       }
       dom += "<td>" + status + "</td>";
-      dom += '<td><div class="btn-group"><button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button><div class="dropdown-menu"><a class="dropdown-item" href="javascript:void(0);" onclick="onDetail(\'' + serverid + '\');">View detail</a><div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="javascript:void(0);" onclick="openDeleteModal(\'' + serverid + '\', \'' + name + '\');">Delete instance</a></div></div></td>';
+      dom += '<td><div class="btn-group"><button class="btn btn-outline-dark btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Actions</button><div class="dropdown-menu">';
+      var dropdown_item = '<a class="dropdown-item" href="javascript:void(0);" onclick="onDetail(\'' + serverid + '\');">View detail</a>';
+      // Boot instance.
+      if (status == "SHUTOFF") {
+        dropdown_item += '<a class="dropdown-item" href="javascript:void(0);" onclick="bootInstance(\'' + serverid + '\');">Boot instance</a>'
+      }
+      dropdown_item += '<div class="dropdown-divider"></div>';
+      dropdown_item += '<a class="dropdown-item text-danger" href="javascript:void(0);" onclick="openDeleteModal(\'' + serverid + '\', \'' + name + '\');">Delete instance</a>';
+      dom += dropdown_item;
+      dom += '</div></div></td>';
       $('#instance-list').append(dom);
     }
 

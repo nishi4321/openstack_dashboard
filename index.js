@@ -122,6 +122,17 @@ app.post("/api/createinstance", function (req, res, next) {
 });
 
 /**
+ * Boot instance.
+ */
+app.post("/api/bootinstance", function (req, res, next) {
+    openstackapi.bootinstance(req.decoded.token, req.body.instanceId).then(function (result) {
+        res.json({ success: true, body: result });
+    }).catch(function (error) {
+        res.json({ success: false, msg: error })
+    })
+});
+
+/**
  * Get flavor list.
  */
 app.get("/api/getflavors", function (req, res, next) {
