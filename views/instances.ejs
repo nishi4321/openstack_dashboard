@@ -485,11 +485,13 @@
       dom += "<td>" + cpu + "Core</td>";
       dom += "<td>" + memory + "MB</td>";
       dom += "<td>" + disk + "GB</td>";
+      var imageName = "Unknown";
       for (var img of imageList) {
         if (img.id == image) {
-          dom += "<td>" + img.name + "</td>";
+          imageName = img.name;
         }
       }
+      dom += "<td>" + imageName + "</td>";
       try {
         var sgText = [];
         for (var j of securitygroup) {
