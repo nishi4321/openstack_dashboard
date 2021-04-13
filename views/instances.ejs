@@ -85,6 +85,7 @@
                 <th>IP Addresses</th>
                 <th>CPU</th>
                 <th>Memory</th>
+                <th>Disk</th>
                 <th>Image</th>
                 <th>Security Group</th>
                 <th>Status</th>
@@ -279,13 +280,15 @@
             var flavorId = instance.flavor.id;
             var cpu;
             var memory;
+            var disk;
             for (var f of flavorList) {
               if (f.id == flavorId) {
                 cpu = f.vcpus;
                 memory = f.ram;
+                disk = f.disk;
               }
             }
-            generateList(instance.name, instance.addresses, cpu, memory, instance.image.id, instance.security_groups, instance.status, instance.id)
+            generateList(instance.name, instance.addresses, cpu, memory, disk, instance.image.id, instance.security_groups, instance.status, instance.id)
           }
           // 
           $('#loadprogress').hide();
@@ -378,6 +381,7 @@
             if (f.id == detail.flavor.id) {
               detailBody += "<dt class='col-sm-4'>CPU</dt><dd class='col-sm-8'>" + f.vcpus + "Core</dd>";
               detailBody += "<dt class='col-sm-4'>Memory</dt><dd class='col-sm-8'>" + f.ram + "MB</dd>";
+              detailBody += "<dt class='col-sm-4'>Disk</dt><dd class='col-sm-8'>" + f.disk + "GB</dd>";
             }
           }
           // Addresses
@@ -462,7 +466,7 @@
       });
     }
 
-    function generateList(name, ipaddreses, cpu, memory, image, securitygroup, status, serverid) {
+    function generateList(name, ipaddreses, cpu, memory, disk, image, securitygroup, status, serverid) {
       var dom = "<tr>";
       dom += "<td>" + name + "</td>";
       try {
@@ -480,6 +484,7 @@
       }
       dom += "<td>" + cpu + "Core</td>";
       dom += "<td>" + memory + "MB</td>";
+      dom += "<td>" + disk + "GB</td>";
       for (var img of imageList) {
         if (img.id == image) {
           dom += "<td>" + img.name + "</td>";
