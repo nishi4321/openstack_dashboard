@@ -3,7 +3,9 @@
 
 <head>
   <title>OpenStack Dashboard</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
   <link href="https://fonts.googleapis.com/css?family=Noto+Sans+JP&display=swap" rel="stylesheet">
   <link href="./css/dashboard.css" rel="stylesheet">
 
@@ -11,24 +13,52 @@
 </head>
 
 <body>
-  <a id="skippy" class="sr-only sr-only-focusable" href="#content">
-    <div class="container">
-      <span class="skiplink-text">Skip to main content</span>
-    </div>
-  </a>
 
-  <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-    <!-- <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Company name</a> -->
-    <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">OpenStack Dashboard</a>
-    <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
-    <input class="form-control form-control-dark w-100" type="text" placeholder="検索" aria-label="検索">
+  <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+    <a class="navbar-brand col-md-3 col-lg-2 me-0 px-3" href="#">OpenStack Dashboard</a>
+    <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse"
+      data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div style="margin-right: 0; margin-left: auto;">
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            Dropdown
+          </a>
+          <ul class="dropdown-menu-end dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDarkDropdownMenuLink"
+            style="position: absolute !important; right: 0 !important;">
+            <% for (var i=0; i < Regions.length; i++) { %>
+              <li><a class="dropdown-item" href="#" onclick="onChangeRegion('<%= Regions[i] %>');">
+                  <%= Regions[i] %>
+                </a></li>
+              <% } %>
+          </ul>
+        </li>
+      </ul>
+    </div>
     <ul class="navbar-nav px-3">
       <li class="nav-item text-nowrap">
-        <!-- <a class="nav-link" href="#">Sign out</a> -->
+        <span class="navbar-text">
+          <%= USERNAME %>
+        </span>
+      </li>
+    </ul>
+    <ul class="navbar-nav px-3">
+      <li class="nav-item text-nowrap">
         <a class="nav-link" href="javascript:void(0);" onclick="onLogout()">Logout</a>
       </li>
     </ul>
-  </nav>
+  </header>
+
+  <script>
+    function onChangeRegion(region) {
+      Cookies.set("region", region, { expires: 1 })
+      $('#navbarDarkDropdownMenuLink').text(region);
+      location.reload();
+    }
+  </script>
 
   <div class="container-fluid">
     <div class="row">
@@ -36,15 +66,13 @@
         <div class="sidebar-sticky">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link active" href="javascript:void(0);"
-                onclick="location.href = '/dashboard?token=' + Cookies.get('jwttoken');">
+              <a class="nav-link active" href="/dashboard">
                 <span data-feather="bar-chart-2"></span>
-                Overview<span class="sr-only">(current)</span>
+                Overview
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="javascript:void(0);"
-                onclick="location.href = '/instances?token=' + Cookies.get('jwttoken');">
+              <a class="nav-link" href="/instances">
                 <span data-feather="cpu"></span>
                 Instance
               </a>
@@ -65,7 +93,7 @@
         </div>
       </nav>
 
-      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+      <main role="main" class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
         <div
           class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
           <h1 class="h2">Overview</h1>
@@ -121,11 +149,30 @@
 
   <script src="https://cdn.jsdelivr.net/npm/superagent@6.1.0/dist/superagent.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+    crossorigin="anonymous"></script>
+  <script>
+    window.jQuery || document.write('<script src="/docs/4.4/assets/js/vendor/jquery-slim.min.js"><\/script>')
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
+    crossorigin="anonymous"></script>
+
 
   <script>
     var request = window.superagent;
 
     onLoad();
+
+    function setDefaultRegion() {
+      if (Cookies.get("region")) {
+        $('#navbarDarkDropdownMenuLink').text(Cookies.get("region"));
+      } else {
+        $('#navbarDarkDropdownMenuLink').text("<%= Regions[0] %>");
+        Cookies.set("region", "<%= Regions[0] %>", { expires: 1 })
+      }
+    }
 
     function onLogout() {
       Cookies.remove("jwttoken");
@@ -133,11 +180,12 @@
     }
 
     function onLoad() {
+      setDefaultRegion();
       getQuota();
     }
 
     function getQuota() {
-      request.get("/api/getquotas?token=" + Cookies.get("jwttoken")).end(function (err, res) {
+      request.get("/api/getquotas?token=" + Cookies.get("jwttoken") + "&region=" + Cookies.get("region")).end(function (err, res) {
         if (res.body.success) {
           // OK
           var quota_set = JSON.parse(res.body.body).quota_set;
@@ -168,13 +216,6 @@
     feather.replace()
   </script>
 
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-    integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-    crossorigin="anonymous"></script>
-  <script>
-    window.jQuery || document.write('<script src="/docs/4.4/assets/js/vendor/jquery-slim.min.js"><\/script>')
-  </script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

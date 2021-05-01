@@ -14,9 +14,9 @@ exports.identity = function (username, password) {
     })
 }
 
-exports.getflavors = function (token) {
+exports.getflavors = function (token, region) {
     return new Promise(function (resolve, reject) {
-        flavor.getflavors(token).then(function (body) {
+        flavor.getflavors(token, region).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);
@@ -24,9 +24,9 @@ exports.getflavors = function (token) {
     })
 }
 
-exports.getservers = function (token) {
+exports.getservers = function (token, region) {
     return new Promise(function (resolve, reject) {
-        server.getservers(token).then(function (body) {
+        server.getservers(token, region).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);
@@ -34,9 +34,9 @@ exports.getservers = function (token) {
     })
 }
 
-exports.getserverdetail = function (token, serverid) {
+exports.getserverdetail = function (token, serverid, region) {
     return new Promise(function (resolve, reject) {
-        server.getserverdetail(token, serverid).then(function (body) {
+        server.getserverdetail(token, serverid, region).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);
@@ -44,9 +44,9 @@ exports.getserverdetail = function (token, serverid) {
     })
 }
 
-exports.deleteinstance = function (token, serverid) {
+exports.deleteinstance = function (token, serverid, region) {
     return new Promise(function (resolve, reject) {
-        server.deleteinstance(token, serverid).then(function (body) {
+        server.deleteinstance(token, serverid, region).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);
@@ -54,9 +54,9 @@ exports.deleteinstance = function (token, serverid) {
     })
 }
 
-exports.getquotas = function (token, projectid) {
+exports.getquotas = function (token, projectid, region) {
     return new Promise(function (resolve, reject) {
-        quota.getquotas(token, projectid).then(function (body) {
+        quota.getquotas(token, projectid, region).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);
@@ -64,9 +64,9 @@ exports.getquotas = function (token, projectid) {
     })
 }
 
-exports.getimages = function (token) {
+exports.getimages = function (token, region) {
     return new Promise(function (resolve, reject) {
-        image.getimage(token).then(function (body) {
+        image.getimage(token, region).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);
@@ -74,9 +74,9 @@ exports.getimages = function (token) {
     })
 }
 
-exports.createinstance = function (token, name, image, flavor, password) {
+exports.createinstance = function (token, name, image, image_text, flavor, password, region) {
     return new Promise(function (resolve, reject) {
-        server.createinstance(token, name, image, flavor, password).then(function (body) {
+        server.createinstance(token, name, image, image_text, flavor, password, region).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);
@@ -84,9 +84,9 @@ exports.createinstance = function (token, name, image, flavor, password) {
     })
 }
 
-exports.bootinstance = function (token, instanceId) {
+exports.bootinstance = function (token, instanceId, region) {
     return new Promise(function (resolve, reject) {
-        server.bootinstance(token, instanceId).then(function (body) {
+        server.bootinstance(token, instanceId, region).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);

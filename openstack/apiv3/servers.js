@@ -1,10 +1,21 @@
 var request = require('request');
 require('dotenv').config();
 
-exports.getservers = function (token) {
+var fs = require('fs');
+const msg = fs.readFileSync("config.json", { encoding: "utf-8" });
+var config = JSON.parse(msg).Credentials;
+
+exports.getservers = function (token, region) {
     return new Promise(function (resolve, reject) {
+        var COMPUTE_API_URL;
+        for (i = 0; i < config.length; i++) {
+            if (region == config[i].REGION_NAME) {
+                COMPUTE_API_URL = config[i].COMPUTE_API_URL;
+                break;
+            }
+        }
         var options = {
-            uri: process.env.COMPUTE_API_URL + "/servers/detail",
+            uri: COMPUTE_API_URL + "/servers/detail",
             headers: {
                 "Content-Type": "application/json",
                 "X-Auth-Token": token,
@@ -21,10 +32,17 @@ exports.getservers = function (token) {
     })
 }
 
-exports.getserverdetail = function (token, serverid) {
+exports.getserverdetail = function (token, serverid, region) {
     return new Promise(function (resolve, reject) {
+        var COMPUTE_API_URL;
+        for (i = 0; i < config.length; i++) {
+            if (region == config[i].REGION_NAME) {
+                COMPUTE_API_URL = config[i].COMPUTE_API_URL;
+                break;
+            }
+        }
         var options = {
-            uri: process.env.COMPUTE_API_URL + "/servers/" + serverid,
+            uri: COMPUTE_API_URL + "/servers/" + serverid,
             headers: {
                 "Content-Type": "application/json",
                 "X-Auth-Token": token,
@@ -41,10 +59,17 @@ exports.getserverdetail = function (token, serverid) {
     })
 }
 
-exports.deleteinstance = function (token, serverid) {
+exports.deleteinstance = function (token, serverid, region) {
     return new Promise(function (resolve, reject) {
+        var COMPUTE_API_URL;
+        for (i = 0; i < config.length; i++) {
+            if (region == config[i].REGION_NAME) {
+                COMPUTE_API_URL = config[i].COMPUTE_API_URL;
+                break;
+            }
+        }
         var options = {
-            uri: process.env.COMPUTE_API_URL + "/servers/" + serverid,
+            uri: COMPUTE_API_URL + "/servers/" + serverid,
             headers: {
                 "Content-Type": "application/json",
                 "X-Auth-Token": token,
@@ -61,37 +86,78 @@ exports.deleteinstance = function (token, serverid) {
     })
 }
 
-exports.createinstance = function (token, name, image, flavor, password) {
+exports.createinstance = function (token, name, image, image_text, flavor, password, region) {
     return new Promise(function (resolve, reject) {
         // 
-        var cloud_init = "#cloud-config\n"
-        cloud_init += "password: " + password + "\n"
-        cloud_init += "chpasswd: { expire: False }\n"
-        cloud_init += "ssh_pwauth: True";
-        var buffer = new Buffer(cloud_init);
-        var string = buffer.toString('base64');
-        // 
-        var options = {
-            uri: process.env.COMPUTE_API_URL + "/servers",
-            headers: {
-                "Content-Type": "application/json",
-                "X-Auth-Token": token,
-            },
-            json: {
-                "server": {
-                    "name": name,
-                    "imageRef": image,
-                    "flavorRef": flavor,
-                    "OS-DCF:diskConfig": "AUTO",
-                    "security_groups": [
-                        {
-                            "name": "default"
-                        }
-                    ],
-                    "user_data": string
-                }
+        var COMPUTE_API_URL;
+        for (i = 0; i < config.length; i++) {
+            if (region == config[i].REGION_NAME) {
+                COMPUTE_API_URL = config[i].COMPUTE_API_URL;
+                break;
             }
-        };
+        }
+        var options = {};
+        if (image_text.includes("windows")) {
+            // Windows instance with Cloudbase-Init
+            var user_data = "#ps1_sysnative\nRename-Computer -NewName \""+name+"\" -Force -Restart";
+            var buffer = new Buffer(user_data);
+            var string = buffer.toString('base64');
+            // 
+            options = {
+                uri: COMPUTE_API_URL + "/servers",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Auth-Token": token,
+                },
+                json: {
+                    "server": {
+                        "name": name,
+                        "imageRef": image,
+                        "flavorRef": flavor,
+                        "metadata" : {
+                            "admin_pass": password
+                        },
+                        "OS-DCF:diskConfig": "AUTO",
+                        "security_groups": [
+                            {
+                                "name": "default"
+                            }
+                        ],
+                        "user_data": string
+                    }
+                }
+            };
+        } else {
+            // Linux instance with Cloud-Init
+            var cloud_init = "#cloud-config\n"
+            cloud_init += "password: " + password + "\n"
+            cloud_init += "chpasswd: { expire: False }\n"
+            cloud_init += "ssh_pwauth: True";
+            var buffer = new Buffer(cloud_init);
+            var string = buffer.toString('base64');
+            //
+            options = {
+                uri: COMPUTE_API_URL + "/servers",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Auth-Token": token,
+                },
+                json: {
+                    "server": {
+                        "name": name,
+                        "imageRef": image,
+                        "flavorRef": flavor,
+                        "OS-DCF:diskConfig": "AUTO",
+                        "security_groups": [
+                            {
+                                "name": "default"
+                            }
+                        ],
+                        "user_data": string
+                    }
+                }
+            };
+        }
         request.post(options, function (error, response, body) {
             if (error || response.statusCode != 202) {
                 reject(body)
@@ -102,11 +168,18 @@ exports.createinstance = function (token, name, image, flavor, password) {
     })
 }
 
-exports.bootinstance = function (token, instanceId) {
+exports.bootinstance = function (token, instanceId, region) {
     return new Promise(function (resolve, reject) {
         // 
+        var COMPUTE_API_URL;
+        for (i = 0; i < config.length; i++) {
+            if (region == config[i].REGION_NAME) {
+                COMPUTE_API_URL = config[i].COMPUTE_API_URL;
+                break;
+            }
+        }
         var options = {
-            uri: process.env.COMPUTE_API_URL + "/servers/" + instanceId + "/action",
+            uri: COMPUTE_API_URL + "/servers/" + instanceId + "/action",
             headers: {
                 "Content-Type": "application/json",
                 "X-Auth-Token": token,
