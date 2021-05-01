@@ -137,6 +137,10 @@ app.post("/api/deleteinstance", function (req, res, next) {
  * Create instance.
  */
 app.post("/api/createinstance", function (req, res, next) {
+    if((req.body.name).includes(" ")) {
+        res.json({success: false, msg: {"error": { message: "Cannot use space in \"Name\""}}})
+        return;
+    }
     openstackapi.createinstance(req.decoded.token, req.body.name, req.body.image, req.body.os_text, req.body.flavor, req.body.password, req.query.region).then(function (result) {
         res.json({ success: true, body: result });
     }).catch(function (error) {
