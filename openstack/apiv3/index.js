@@ -3,6 +3,7 @@ const flavor = require("./flavors");
 const server = require("./servers");
 const quota = require("./quota");
 const image = require("./image");
+const network = require("./network");
 
 exports.identity = function (username, password) {
     return new Promise(function (resolve, reject) {
@@ -74,9 +75,19 @@ exports.getimages = function (token, region) {
     })
 }
 
-exports.createinstance = function (token, name, image, image_text, flavor, password, region) {
+exports.getnetworks = function (token, region) {
     return new Promise(function (resolve, reject) {
-        server.createinstance(token, name, image, image_text, flavor, password, region).then(function (body) {
+        network.getnetworks(token, region).then(function (body) {
+            resolve(body);
+        }).catch(function (error) {
+            reject(error);
+        });
+    })
+}
+
+exports.createinstance = function (token, name, image, image_text, flavor, password, region, network) {
+    return new Promise(function (resolve, reject) {
+        server.createinstance(token, name, image, image_text, flavor, password, region, network).then(function (body) {
             resolve(body);
         }).catch(function (error) {
             reject(error);

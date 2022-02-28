@@ -141,7 +141,7 @@ app.post("/api/createinstance", function (req, res, next) {
         res.json({success: false, msg: {"error": { message: "Cannot use space in \"Name\""}}})
         return;
     }
-    openstackapi.createinstance(req.decoded.token, req.body.name, req.body.image, req.body.os_text, req.body.flavor, req.body.password, req.query.region).then(function (result) {
+    openstackapi.createinstance(req.decoded.token, req.body.name, req.body.image, req.body.os_text, req.body.flavor, req.body.password, req.query.region, req.body.network).then(function (result) {
         res.json({ success: true, body: result });
     }).catch(function (error) {
         res.json({ success: false, msg: error })
@@ -189,6 +189,17 @@ app.get("/api/getquotas", function (req, res, next) {
         res.json({ success: true, body: result });
     }).catch(function () {
         res.json({ success: false, msg: "Failed to get quota." })
+    })
+});
+
+/**
+ * Get networks.
+ */
+app.get("/api/getnetworks", function (req, res, next) {
+    openstackapi.getnetworks(req.decoded.token, req.query.region).then(function (result) {
+        res.json({ success: true, body: result });
+    }).catch(function () {
+        res.json({ success: false, msg: "Failed to get network." })
     })
 });
 

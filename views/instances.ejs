@@ -183,6 +183,12 @@
                 <option>Small select</option>
               </select>
             </div>
+            <div class="mb-3">
+              <label for="ci-network" class="form-label">Instance network</label>
+              <select class="form-select form-select-sm" id="ci-network">
+                <option>Small select</option>
+              </select>
+            </div>
             <div class="mb-3" style="display: none;">
               <label for="ci-password-dummy" class="form-label">Instance password</label>
               <input class="form-control form-control-sm" id="ci-password-dummy" type="password"
@@ -253,6 +259,7 @@
 
     var flavorList;
     var imageList;
+    var networkList;
 
     onLoad();
 
@@ -278,7 +285,9 @@
       $('#loadprogress').show();
       getFlavorList().then(function () {
         getImageList().then(function () {
-          getInstanceList();
+          getNetworkList().then(function () {
+            getInstanceList();
+          })
         })
       });
     }
@@ -325,6 +334,22 @@
       })
     }
 
+    function getNetworkList() {
+      return new Promise(function (resolve, reject) {
+        // Get Image list.
+        request.get("/api/getnetworks?token=" + Cookies.get("jwttoken") + "&region=" + Cookies.get("region")).end(function (err, res2) {
+          if (res2.body.success) {
+            // OK
+            networkList = JSON.parse(res2.body.body).networks;
+            resolve();
+          } else {
+            // Bad
+            reject();
+          }
+        });
+      })
+    }
+
     function getInstanceList() {
       request.get("/api/getinstances?token=" + Cookies.get("jwttoken") + "&region=" + Cookies.get("region")).end(function (err, res) {
         if (res.body.success) {
@@ -361,8 +386,9 @@
       var os = $('#ci-os').val();
       var os_text = $('#ci-os option:selected').text().toLowerCase();
       var size = $('#ci-size').val();
+      var network = $('#ci-network').val();
       var password = $('#ci-password').val();
-      request.post("/api/createinstance?token=" + Cookies.get("jwttoken") + "&region=" + Cookies.get("region")).send({ name: name, image: os, os_text: os_text, flavor: size, password: password }).end(function (err, res) {
+      request.post("/api/createinstance?token=" + Cookies.get("jwttoken") + "&region=" + Cookies.get("region")).send({ name: name, image: os, os_text: os_text, flavor: size, password: password, network: network }).end(function (err, res) {
         if (res.body.success) {
           // OK
           var result = res.body.body.server;
@@ -404,10 +430,15 @@
       for (var f of flavorList) {
         $('#ci-size').append("<option value=\'" + f.id + "\'>" + f.name + " (vCPU : " + f.vcpus + "Core, Memory : " + f.ram + "MB, Disk : " + f.disk + "GB)</option>");
       }
-      // Get Image list.
+      // Set Image list.
       $('#ci-os').text("");
       for (var i of imageList) {
         $('#ci-os').append("<option value=\'" + i.id + "\'>" + i.name + "</option>");
+      }
+      // Set Network list.
+      $('#ci-network').text("");
+      for (var i of networkList) {
+        $('#ci-network').append("<option value=\'" + i.id + "\'>" + i.name + "</option>");
       }
       onChangeCIOS();
     }
@@ -446,12 +477,12 @@
             var keys = Object.keys(detail.addresses)
             for (var key of keys) {
               var ipaddressesList = detail.addresses[key];
-              var ipText = [];
+              var ipText = "";
               for (var i of ipaddressesList) {
-                ipText.push(i.addr);
+                ipText += "[" + key + "] " + i.addr + "<br>";
               }
             }
-            detailBody += "<dt class='col-sm-4'>IP Addresses</dt><dd class='col-sm-8'>" + ipText.toString().replace(",", ", ") + "</dd>";
+            detailBody += "<dt class='col-sm-4'>IP Addresses</dt><dd class='col-sm-8'>" + ipText + "</dd>";
           } catch (e) {
             detailBody += "<dt class='col-sm-4'>IP Addresses</dt><dd class='col-sm-8'></dd>";
           }

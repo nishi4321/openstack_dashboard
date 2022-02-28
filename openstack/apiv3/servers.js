@@ -86,7 +86,7 @@ exports.deleteinstance = function (token, serverid, region) {
     })
 }
 
-exports.createinstance = function (token, name, image, image_text, flavor, password, region) {
+exports.createinstance = function (token, name, image, image_text, flavor, password, region, network) {
     return new Promise(function (resolve, reject) {
         // 
         var COMPUTE_API_URL;
@@ -123,7 +123,10 @@ exports.createinstance = function (token, name, image, image_text, flavor, passw
                                 "name": "default"
                             }
                         ],
-                        "user_data": string
+                        "user_data": string,
+                        "networks" : [{
+                            "uuid" : network
+                        }]
                     }
                 }
             };
@@ -153,7 +156,10 @@ exports.createinstance = function (token, name, image, image_text, flavor, passw
                                 "name": "default"
                             }
                         ],
-                        "user_data": string
+                        "user_data": string,
+                        "networks" : [{
+                            "uuid" : network
+                        }]
                     }
                 }
             };
