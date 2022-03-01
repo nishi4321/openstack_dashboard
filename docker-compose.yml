@@ -1,0 +1,12 @@
+version: '2'
+services:
+  node:
+    image: node:12
+    restart: always
+    container_name: openstack_dashboard
+    working_dir: /node/src/app
+    ports:
+      - 80:3000
+    volumes:
+      - .:/node/src/app
+    command: npm start
