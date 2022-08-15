@@ -30,6 +30,7 @@ $ npm i
 ```
 {
     "SUPER_SECRET": "認証に使用されるJWTのシークレット",
+    "UBUNTU_MIRROR_URL": "UBUNTU_MIRROR_SERVER_URL",
     "Credentials": [
         {
             "REGION_NAME": "管理画面上に表示するリージョン名",
@@ -43,7 +44,8 @@ $ npm i
             "OS_INTERFACE": "OS_INTERFACE",
             "OS_IDENTITY_API_VERSION": "OS_IDENTITY_API_VERSION",
             "COMPUTE_API_URL": "COMPUTE_API_URL",
-            "IMAGE_API_URL": "IMAGE_API_URL"
+            "IMAGE_API_URL": "IMAGE_API_URL",
+            "NETWORK_API_URL": "NETWORK_API_URL"
         },{
             ..........
         }
