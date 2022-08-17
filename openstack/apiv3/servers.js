@@ -3,6 +3,7 @@ require('dotenv').config();
 
 var fs = require('fs');
 const msg = fs.readFileSync("config.json", { encoding: "utf-8" });
+var UBUNTU_MIRROR_URL = JSON.parse(msg).UBUNTU_MIRROR_URL
 var config = JSON.parse(msg).Credentials;
 
 exports.getservers = function (token, region) {
@@ -141,7 +142,7 @@ exports.createinstance = function (token, name, image, image_text, flavor, passw
             cloud_init += "  primary:\n";
             cloud_init += "    - arches:\n";
             cloud_init += "      - amd64\n";
-            cloud_init += "      uri: \""+config.UBUNTU_MIRROR_URL+"\"\n";
+            cloud_init += "      uri: \""+UBUNTU_MIRROR_URL+"\"\n";
             cloud_init += "  security:\n";
             cloud_init += "    - arches:\n";
             cloud_init += "      - amd64\n";
